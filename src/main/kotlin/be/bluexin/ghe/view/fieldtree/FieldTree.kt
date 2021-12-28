@@ -44,7 +44,7 @@ class ExpandableField(
     }
 }
 
-class FieldTree(layout: DataLayout) {
+class FieldTree(val layout: DataLayout) {
     private val topLevel = layout.fields.map { ExpandableField(it, 0) }
 
     val items: List<ExpandableField> get() = topLevel.asSequence().flatMap { listOf(it) + it.children }.toList()

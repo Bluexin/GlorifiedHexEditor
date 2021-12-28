@@ -11,11 +11,13 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import be.bluexin.ghe.json.*
+import be.bluexin.ghe.loader.Loader
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import compose.icons.evaicons.OutlineGroup
 import compose.icons.evaicons.outline.Menu
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import java.io.File
@@ -28,44 +30,6 @@ val objectMapper = jacksonObjectMapper().apply {
 val settingsFile = File("settings.json")
 
 val logger = KotlinLogging.logger {}
-
-private fun loadLayouts(
-    root: File,
-    metadata: Metadata?,
-    structures: Map<String, LayoutStructure>,
-    lookups: Map<String, LayoutLookup>
-): Map<String, DataLayout> {
-    if (metadata == null) return emptyMap()
-    logger.info { "loading ${DataLayout::class.simpleName}" }
-    return File(root, metadata.layouts).walk().filter { !it.isDirectory }.mapNotNull {
-        try {
-            val layout = objectMapper.readValue<DataLayout>(it)
-            layout.load(metadata, structures, lookups)
-            layout
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to load $it" }
-            null
-        }
-    }.associateBy(DataLayout::fileFilter)
-}
-
-private inline fun <reified T : Named> load(root: File, directory: String?): Map<String, T> {
-    if (directory == null) return emptyMap()
-    logger.info { "Loading ${T::class.simpleName}" }
-    return File(root, directory).walk().filter { !it.isDirectory }.mapNotNull {
-        try {
-            objectMapper.readValue<T>(it)
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to load $it" }
-            null
-        }
-    }.associateBy(Named::name)
-}
-
-private fun loadStructures(root: File, metadata: Metadata?): Map<String, LayoutStructure> =
-    load(root, metadata?.structures)
-
-private fun loadLookups(root: File, metadata: Metadata?): Map<String, LayoutLookup> = load(root, metadata?.lookups)
 
 private fun loadSettings(): Settings? {
     return if (settingsFile.isFile) try {
@@ -87,14 +51,37 @@ fun FrameWindowScope.App() {
     val metadata = remember(settings) {
         settings?.let { objectMapper.readValue<Metadata>(File(it.metadata)) }
     }
-    val structures = remember(settings, metadata) {
-        settings?.let { loadStructures(File(it.metadata).parentFile, metadata) } ?: emptyMap()
+    var structures by remember(settings, metadata) {
+        mutableStateOf(emptyMap<String, LayoutStructure>())
     }
-    val lookups = remember(settings, metadata) {
-        settings?.let { loadLookups(File(it.metadata).parentFile, metadata) } ?: emptyMap()
+    LaunchedEffect(settings?.metadata, metadata?.structures) {
+        settings?.let { Loader.load<LayoutStructure>(File(it.metadata).parentFile, metadata?.structures) }?.collect {
+            structures = it
+        }
     }
-    val layouts = remember(settings, metadata, structures, lookups) {
-        settings?.let { loadLayouts(File(it.metadata).parentFile, metadata, structures, lookups) } ?: emptyMap()
+    var lookups by remember(settings, metadata) {
+        mutableStateOf(emptyMap<String, LayoutLookup>())
+    }
+    LaunchedEffect(settings?.metadata, metadata?.lookups) {
+        settings?.let { Loader.load<LayoutLookup>(File(it.metadata).parentFile, metadata?.lookups) }?.collect {
+            lookups = it
+        }
+    }
+
+    var layouts by remember {
+        mutableStateOf(emptyMap<String, DataLayout>())
+    }
+    LaunchedEffect(settings?.metadata, metadata?.layouts) {
+        settings?.let {
+            Loader.load<DataLayout>(File(it.metadata).parentFile, metadata?.layouts) { layout ->
+                layout.load(metadata!!, structures, lookups)
+            }
+        }?.collect {
+            layouts = it
+        }
+    }
+    remember(metadata, structures, lookups) {
+        metadata?.let { layouts.forEach { (_, v) -> v.load(it, structures, lookups) } }
     }
 
     fun onLoad(file: File) {

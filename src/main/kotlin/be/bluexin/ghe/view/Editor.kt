@@ -14,7 +14,12 @@ import be.bluexin.ghe.view.fieldtree.FieldTreeView
 
 @Composable
 fun Editor(layouts: Map<String, DataLayout>) {
-    var selectedLayout by remember { mutableStateOf<DataLayout?>(null) }
+    var selectedLayoutName by remember { mutableStateOf<String?>(null) }
+    val selectedLayout by remember(selectedLayoutName, layouts) {
+        derivedStateOf {
+            selectedLayoutName?.let { layouts[it] }
+        }
+    }
     var expanded by remember { mutableStateOf(false) }
     val textValue = remember { mutableStateOf("0123456789ABCDEF".repeat(50)) }
     val selectedRange = remember { mutableStateOf<IntRange?>(null) }
@@ -47,7 +52,7 @@ fun Editor(layouts: Map<String, DataLayout>) {
                 DropdownMenu(expanded, { expanded = false }) {
                     layouts.forEach { (filter, layout) ->
                         DropdownMenuItem({
-                            selectedLayout = layout
+                            selectedLayoutName = layout.name
                             expanded = false
                         }) { Text(filter) }
                     }

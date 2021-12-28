@@ -54,6 +54,9 @@ fun FieldTreeViewTabView() = Surface {
 fun FieldTreeView(model: FieldTree, text: MutableState<String>, selected: MutableState<IntRange?>) = Surface(
     modifier = Modifier.fillMaxSize()
 ) {
+    val items by remember(model.layout.loadingTimeStamp) {
+        derivedStateOf { model.items }
+    }
     Box {
         val scrollState = rememberLazyListState()
 
@@ -63,8 +66,8 @@ fun FieldTreeView(model: FieldTree, text: MutableState<String>, selected: Mutabl
                 .padding(end = 18.dp),
             state = scrollState
         ) {
-            items(model.items.size) {
-                FieldTreeItemView(model.items[it], text, selected)
+            items(items.size) {
+                FieldTreeItemView(items[it], text, selected)
             }
         }
 
@@ -245,8 +248,8 @@ private fun LookupModal(lookupRef: LayoutLookup, currentValue: MutableState<Text
                     }
                 )
 
-                val filtered = remember(searchValue) {
-                    lookupRef.values.withIndex().filter { it.value.contains(searchValue) }
+                val filtered by remember(searchValue, lookupRef) {
+                    derivedStateOf { lookupRef.values.withIndex().filter { it.value.contains(searchValue) } }
                 }
 
                 if (filtered.isEmpty()) {
