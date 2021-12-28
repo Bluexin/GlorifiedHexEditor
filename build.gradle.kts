@@ -16,13 +16,20 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+val scalaVersion = "2.13"
+
 dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.+")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
     implementation("br.com.devsrsouza.compose.icons.jetbrains:eva-icons:1.0.0")
-    implementation("io.github.microutils:kotlin-logging-jvm:2.1.16")
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.8")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
+
+    implementation(platform("com.typesafe.akka:akka-bom_$scalaVersion:2.6.18"))
+    implementation("com.typesafe.akka:akka-actor-typed_$scalaVersion")
+    implementation("com.typesafe.akka:akka-stream_$scalaVersion")
+
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.9")
 }
 
 tasks.test {

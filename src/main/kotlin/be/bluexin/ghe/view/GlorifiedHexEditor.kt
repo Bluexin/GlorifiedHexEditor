@@ -1,5 +1,7 @@
 package be.bluexin.ghe.view
 
+import akka.stream.OverflowStrategy
+import akka.stream.javadsl.Source
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -10,6 +12,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import be.bluexin.ghe.actor.Guardian
+import be.bluexin.ghe.actor.SettingsLoader
+import be.bluexin.ghe.actor.collectAsState
 import be.bluexin.ghe.json.*
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -19,13 +24,13 @@ import compose.icons.evaicons.outline.Menu
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import java.io.File
+import java.util.*
 
 typealias AppIcons = OutlineGroup
 
 val objectMapper = jacksonObjectMapper().apply {
     configure(SerializationFeature.INDENT_OUTPUT, true)
 }
-val settingsFile = File("settings.json")
 
 val logger = KotlinLogging.logger {}
 
@@ -76,30 +81,44 @@ private fun loadSettings(): Settings? {
     } else null
 }
 
+fun FrameWindowScope.MainScreen() {
+
+}
+
 @Composable
 @Preview
 fun FrameWindowScope.App() {
+
+    val source = Source.actorRef<Settings>({ Optional.empty() }, { Optional.empty() }, 5, OverflowStrategy.dropBuffer())
+    val settings by source.collectAsState(Settings.default)
+
+    val system = Guardian.system()
+    val ref = source.preMaterialize(system).first()
+    system.tell(Guardian.WithSettingsLoader {
+        it.tell(SettingsLoader.AddListener(source.preMaterialize(system).first()))
+    })
+
     var darkMode by remember { mutableStateOf(true) }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
-    var settings by remember { mutableStateOf(loadSettings()) }
+//    var settings by remember { mutableStateOf(loadSettings()) }
     val metadata = remember(settings) {
-        settings?.let { objectMapper.readValue<Metadata>(File(it.metadata)) }
+        settings?.metadata?.let { objectMapper.readValue<Metadata>(File(it)) }
     }
     val structures = remember(settings, metadata) {
-        settings?.let { loadStructures(File(it.metadata).parentFile, metadata) } ?: emptyMap()
+        settings?.metadata?.let { loadStructures(File(it).parentFile, metadata) } ?: emptyMap()
     }
     val lookups = remember(settings, metadata) {
-        settings?.let { loadLookups(File(it.metadata).parentFile, metadata) } ?: emptyMap()
+        settings?.metadata?.let { loadLookups(File(it).parentFile, metadata) } ?: emptyMap()
     }
     val layouts = remember(settings, metadata, structures, lookups) {
-        settings?.let { loadLayouts(File(it.metadata).parentFile, metadata, structures, lookups) } ?: emptyMap()
+        settings?.metadata?.let { loadLayouts(File(it).parentFile, metadata, structures, lookups) } ?: emptyMap()
     }
 
     fun onLoad(file: File) {
         try {
-            settings = Settings(file.canonicalPath)
+            settings = Settings(file.canonicalPath, darkMode)
             objectMapper.writeValue(settingsFile, settings)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -107,7 +126,7 @@ fun FrameWindowScope.App() {
     }
 
     MaterialTheme(
-        colors = if (darkMode) darkColors() else lightColors()
+        colors = if (settings.darkTheme) darkColors() else lightColors()
     ) {
         Scaffold(
             scaffoldState = scaffoldState,
