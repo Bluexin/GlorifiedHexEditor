@@ -40,6 +40,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Rpm)
             packageName = "GlorifiedHexEditor"
             packageVersion = "1.0.0"
+            modules += "java.naming"
 
             windows {
                 menuGroup = "Blade & Soul Tools"
