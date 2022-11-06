@@ -1,10 +1,9 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.0.1"
+    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.compose") version "1.2.0"
 }
 
 group = "be.bluexin"
@@ -19,10 +18,10 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
     implementation("br.com.devsrsouza.compose.icons.jetbrains:eva-icons:1.0.0")
-    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.9")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.3")
+    runtimeOnly("ch.qos.logback:logback-classic:1.4.4")
 }
 
 tasks.test {

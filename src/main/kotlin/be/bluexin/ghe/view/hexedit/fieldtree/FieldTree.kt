@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view.fieldtree
+package be.bluexin.ghe.view.hexedit.fieldtree
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

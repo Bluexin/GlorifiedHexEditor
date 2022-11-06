@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view
+package be.bluexin.ghe.view.hexedit
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -9,8 +9,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import be.bluexin.ghe.json.DataLayout
-import be.bluexin.ghe.view.fieldtree.FieldTree
-import be.bluexin.ghe.view.fieldtree.FieldTreeView
+import be.bluexin.ghe.view.common.AppShapes
+import be.bluexin.ghe.view.hexedit.fieldtree.FieldTree
+import be.bluexin.ghe.view.hexedit.fieldtree.FieldTreeView
 
 @Composable
 fun Editor(layouts: Map<String, DataLayout>) {

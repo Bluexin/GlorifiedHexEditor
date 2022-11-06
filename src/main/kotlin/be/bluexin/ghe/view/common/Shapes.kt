@@ -1,10 +1,13 @@
-package be.bluexin.ghe.view
+package be.bluexin.ghe.view.common
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp
+import compose.icons.evaicons.OutlineGroup
+
+typealias AppIcons = OutlineGroup
 
 private val LocalShapes = staticCompositionLocalOf { Shapes() }
 val AppShapes

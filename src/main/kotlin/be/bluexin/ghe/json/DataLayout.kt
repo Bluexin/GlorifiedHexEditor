@@ -25,12 +25,13 @@ class DataLayout(
         logger.info { "Resolving $name" }
         fields.forEach {
             try {
-                @Suppress("NON_EXHAUSTIVE_WHEN_STATEMENT")
                 when (it) {
                     is Structure -> it.structureRef = structures[it.structure]
                         ?: error("Missing referenced structure ${it.structure}")
                     is Lookup -> it.lookupRef = lookups[it.lookup]
                         ?: error("Missing referenced lookup ${it.lookup}")
+
+                    else -> Unit
                 }
             } catch (e: Exception) {
                 logger.info { "\t${e.message}" }

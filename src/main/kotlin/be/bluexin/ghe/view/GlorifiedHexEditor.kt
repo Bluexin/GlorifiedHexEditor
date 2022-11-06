@@ -12,17 +12,15 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import be.bluexin.ghe.json.*
 import be.bluexin.ghe.loader.Loader
+import be.bluexin.ghe.view.hexedit.Editor
+import be.bluexin.ghe.view.menu.LoadButton
+import be.bluexin.ghe.view.menu.menuContent
+import be.bluexin.ghe.view.menu.topBar
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import compose.icons.evaicons.OutlineGroup
-import compose.icons.evaicons.outline.Menu
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import java.io.File
-
-typealias AppIcons = OutlineGroup
 
 val objectMapper = jacksonObjectMapper().apply {
     configure(SerializationFeature.INDENT_OUTPUT, true)
@@ -43,7 +41,7 @@ private fun loadSettings(): Settings? {
 @Composable
 @Preview
 fun FrameWindowScope.App() {
-    var darkMode by remember { mutableStateOf(true) }
+    val darkMode = remember { mutableStateOf(true) }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
@@ -94,31 +92,15 @@ fun FrameWindowScope.App() {
     }
 
     MaterialTheme(
-        colors = if (darkMode) darkColors() else lightColors()
+        colors = if (darkMode.value) darkColors() else lightColors()
     ) {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
-                TopAppBar(
-                    title = { Text(text = "Glorified Hex Editor") },
-                    elevation = 8.dp,
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch { scaffoldState.drawerState.open() }
-                        }) {
-                            Icon(AppIcons.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
+                topBar(scaffoldState, scope)
             },
             drawerContent = {
-                Column(
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                ) {
-                    LoadButton(settings?.metadata, ::onLoad)
-                    DarkLightSwitch(darkMode) { darkMode = it }
-                }
+                menuContent(settings, darkMode, ::onLoad)
             },
             drawerShape = MaterialTheme.shapes.medium,
             floatingActionButton = {

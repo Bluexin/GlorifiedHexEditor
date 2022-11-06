@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view
+package be.bluexin.ghe.view.hexedit
 
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
+import be.bluexin.ghe.view.common.AppShapes
 import kotlin.math.min
 
 private const val BYTE_SIZE = 2

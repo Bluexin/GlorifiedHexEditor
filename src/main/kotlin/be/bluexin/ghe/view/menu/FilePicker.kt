@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view
+package be.bluexin.ghe.view.menu
 
 import androidx.compose.ui.awt.ComposeWindow
 import java.awt.FileDialog

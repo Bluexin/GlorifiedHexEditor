@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view.fieldtree
+package be.bluexin.ghe.view.hexedit.fieldtree
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -28,8 +28,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberDialogState
 import be.bluexin.ghe.json.*
-import be.bluexin.ghe.view.AppIcons
-import be.bluexin.ghe.view.AppShapes
+import be.bluexin.ghe.view.common.AppIcons
+import be.bluexin.ghe.view.common.AppShapes
 import be.bluexin.ghe.view.logger
 import compose.icons.evaicons.outline.*
 import kotlin.math.pow

@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view
+package be.bluexin.ghe.view.menu
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
