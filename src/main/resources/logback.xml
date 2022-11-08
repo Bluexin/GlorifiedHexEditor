@@ -11,6 +11,8 @@
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="be.bluexin.ghe.loader.Loader" level="info"/>
+    <logger name="be.bluexin.ghe.io.LayoutLoader" level="info"/>
+    <logger name="be.bluexin.ghe.io.DataFileHandler" level="debug"/>
+    <logger name="be.bluexin.ghe.io.WatchServiceHelper" level="info"/>
     <logger name="be.bluexin.ghe.json.DataLayout" level="info"/>
 </configuration>
