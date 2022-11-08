@@ -47,9 +47,11 @@ object LayoutLoader {
             flow {
                 val path = realDir.toPath()
                 path.watchEvents(ENTRY_CREATE, ENTRY_MODIFY) { event ->
-                    val eventPath = event.context() as Path
-                    logger.debug { "Event: ${event.kind()} x${event.count()} for $eventPath" }
-                    if (!eventPath.pathString.endsWith('~')) emit(path.resolve(eventPath).toFile())
+                    val eventPath = event.context() as? Path
+                    if (eventPath != null) {
+                        logger.debug { "Event: ${event.kind()} x${event.count()} for $eventPath" }
+                        if (eventPath.pathString.endsWith(".json")) emit(path.resolve(eventPath).toFile())
+                    }
                 }
             }.flowOn(Dispatchers.IO)
                 .debounce(3_000L)

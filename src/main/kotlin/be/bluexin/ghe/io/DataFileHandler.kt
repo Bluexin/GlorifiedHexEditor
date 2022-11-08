@@ -52,9 +52,11 @@ class DataFileHandler {
             ) to flow {
                 val path = file.toPath()
                 path.parent.watchEvents(StandardWatchEventKinds.ENTRY_MODIFY) { event ->
-                    val eventPath = event.context() as Path
-                    logger.debug { "Event: ${event.kind()} x${event.count()} for $eventPath" }
-                    if (path.endsWith(eventPath)) emit(Unit)
+                    val eventPath = event.context() as? Path
+                    if (eventPath != null) {
+                        logger.debug { "Event: ${event.kind()} x${event.count()} for $eventPath" }
+                        if (path.endsWith(eventPath)) emit(Unit)
+                    }
                 }
             }.flowOn(Dispatchers.IO)
                 .runningFold(Unit) { _, _ -> }
