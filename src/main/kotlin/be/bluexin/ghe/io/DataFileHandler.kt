@@ -59,8 +59,6 @@ class DataFileHandler {
                     }
                 }
             }.flowOn(Dispatchers.IO)
-                .runningFold(Unit) { _, _ -> }
-                .drop(1)
                 .debounce(3_000L)
                 .take(1)
         } else null
