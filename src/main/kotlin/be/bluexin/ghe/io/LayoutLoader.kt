@@ -1,24 +1,20 @@
-package be.bluexin.ghe.loader
+package be.bluexin.ghe.io
 
 import be.bluexin.ghe.json.Named
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import java.io.File
-import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds.ENTRY_CREATE
 import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import kotlin.io.path.pathString
 
-object Loader {
-    private fun watchService() = FileSystems.getDefault().newWatchService()
+object LayoutLoader {
     private val objectMapper = jacksonObjectMapper().apply {
         configure(SerializationFeature.INDENT_OUTPUT, true)
     }
@@ -34,7 +30,7 @@ object Loader {
         null
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(FlowPreview::class)
     suspend fun <T : Named> load(
         root: File,
         directory: String?,
@@ -48,24 +44,16 @@ object Loader {
         return if (realDir.isDirectory) withContext(Dispatchers.IO) {
             val initial = realDir.walk().filter { !it.isDirectory }.mapNotNull { it.read(typeRef, init) }.toMap()
 
-            val watchService = watchService()
-            val path = realDir.toPath()
-            logger.debug { "Watching $path" }
-            path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY)
-
             flow {
-                while (true) {
-                    val key = watchService.take()
-                    logger.debug { "Receiving ${key.watchable()}" }
-                    key.pollEvents().forEach { event ->
-                        val eventPath = event.context() as Path
-                        logger.debug { "Event: ${event.kind()} x${event.count()} for $eventPath" }
-                        if (!eventPath.pathString.endsWith('~')) path.resolve(eventPath).toFile().read(typeRef, init)
-                            ?.let { this.emit(it) }
-                    }
-                    key.reset()
+                val path = realDir.toPath()
+                path.watchEvents(ENTRY_CREATE, ENTRY_MODIFY) { event ->
+                    val eventPath = event.context() as Path
+                    logger.debug { "Event: ${event.kind()} x${event.count()} for $eventPath" }
+                    if (!eventPath.pathString.endsWith('~')) emit(path.resolve(eventPath).toFile())
                 }
             }.flowOn(Dispatchers.IO)
+                .debounce(3_000L)
+                .mapNotNull { it.read(typeRef, init) }
                 .runningFold(initial) { acc, it -> acc + it }
         } else emptyFlow()
     }

@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view.menu
+package be.bluexin.ghe.view.shell
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon

@@ -14,7 +14,7 @@ import be.bluexin.ghe.view.hexedit.fieldtree.FieldTree
 import be.bluexin.ghe.view.hexedit.fieldtree.FieldTreeView
 
 @Composable
-fun Editor(layouts: Map<String, DataLayout>) {
+fun HexEditor(layouts: Map<String, DataLayout>) {
     var selectedLayoutName by remember { mutableStateOf<String?>(null) }
     val selectedLayout by remember(selectedLayoutName, layouts) {
         derivedStateOf {

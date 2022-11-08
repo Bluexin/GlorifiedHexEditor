@@ -1,4 +1,4 @@
-package be.bluexin.ghe.view.menu
+package be.bluexin.ghe.view.shell
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -18,7 +18,8 @@ import java.io.File
 @Composable
 fun FrameWindowScope.topBar(
     scaffoldState: ScaffoldState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    selectedTab: MutableState<AppTabs>
 ) {
     TopAppBar(
         title = { Text(text = "Glorified Hex Editor") },
@@ -29,6 +30,11 @@ fun FrameWindowScope.topBar(
             }) {
                 Icon(AppIcons.Menu, contentDescription = "Menu")
             }
+        },
+        actions = {
+            TabRow(selectedTab.value.ordinal) {
+                AppTabs.values().forEach { Tab(it, selectedTab) }
+            }
         }
     )
 }
@@ -38,12 +44,20 @@ fun FrameWindowScope.menuContent(
     settings: Settings?,
     darkMode: MutableState<Boolean>,
     onLoad: (File) -> Unit
+) = Column(
+    modifier = Modifier
+        .padding(start = 8.dp)
 ) {
-    Column(
-        modifier = Modifier
-            .padding(start = 8.dp)
-    ) {
-        LoadButton(settings?.metadata, onLoad)
-        DarkLightSwitch(darkMode.value) { darkMode.value = it }
-    }
+    LoadButton(settings?.metadata, onLoad)
+    DarkLightSwitch(darkMode.value) { darkMode.value = it }
 }
+
+@Composable
+private fun Tab(
+    tab: AppTabs,
+    selectedTab: MutableState<AppTabs>
+) = Tab(
+    selected = selectedTab.value == tab,
+    onClick = { selectedTab.value = tab },
+    text = { Text(tab.displayName) }
+)

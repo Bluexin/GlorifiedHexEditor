@@ -5,6 +5,7 @@ import org.jetbrains.skiko.currentNanoTime
 
 data class Settings(
     val metadata: String,
+    val clientFiles: String?,
     @JsonIgnore
     val nanos: Long = currentNanoTime()
 )
