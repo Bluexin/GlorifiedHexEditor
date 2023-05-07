@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project("HexDataLayoutLoader"))
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")

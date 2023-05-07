@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import be.bluexin.ghe.io.DataFile
-import be.bluexin.ghe.json.DataLayout
+import be.bluexin.layoutloader.DataLayout
 
 @Composable
 fun XmlEditor(layouts: Map<String, DataLayout>, data: DataFile?) {

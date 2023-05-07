@@ -16,10 +16,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import be.bluexin.ghe.io.DataFile
 import be.bluexin.ghe.io.DataHolder
-import be.bluexin.ghe.json.*
 import be.bluexin.ghe.view.common.AppIcons
 import be.bluexin.ghe.view.hexedit.fieldtree.tooltip
 import be.bluexin.ghe.view.logger
+import be.bluexin.layoutloader.*
 import compose.icons.evaicons.outline.Checkmark
 import compose.icons.evaicons.outline.Save
 import compose.icons.evaicons.outline.Sync

@@ -11,10 +11,10 @@ import androidx.compose.ui.window.FrameWindowScope
 import be.bluexin.ghe.io.DataFile
 import be.bluexin.ghe.io.DataFileHandler
 import be.bluexin.ghe.io.LayoutLoader
-import be.bluexin.ghe.json.*
 import be.bluexin.ghe.view.hexedit.HexEditor
 import be.bluexin.ghe.view.logger
 import be.bluexin.ghe.view.xmledit.XmlEditor
+import be.bluexin.layoutloader.*
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

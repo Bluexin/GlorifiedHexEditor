@@ -8,10 +8,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import be.bluexin.ghe.json.DataLayout
 import be.bluexin.ghe.view.common.AppShapes
 import be.bluexin.ghe.view.hexedit.fieldtree.FieldTree
 import be.bluexin.ghe.view.hexedit.fieldtree.FieldTreeView
+import be.bluexin.layoutloader.DataLayout
 
 @Composable
 fun HexEditor(layouts: Map<String, DataLayout>) {

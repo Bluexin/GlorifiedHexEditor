@@ -27,10 +27,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberDialogState
-import be.bluexin.ghe.json.*
 import be.bluexin.ghe.view.common.AppIcons
 import be.bluexin.ghe.view.common.AppShapes
 import be.bluexin.ghe.view.logger
+import be.bluexin.layoutloader.*
 import compose.icons.evaicons.outline.*
 import kotlin.math.pow
 import androidx.compose.ui.geometry.Size as GeomSize

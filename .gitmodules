@@ -1,0 +1,3 @@
+[submodule "HexDataLayoutLoader"]
+	path = HexDataLayoutLoader
+	url = git@github.com:Bluexin/HexDataLayoutLoader.git

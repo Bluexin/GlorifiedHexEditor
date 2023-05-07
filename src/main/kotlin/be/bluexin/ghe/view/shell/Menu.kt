@@ -8,8 +8,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
-import be.bluexin.ghe.json.Settings
 import be.bluexin.ghe.view.common.AppIcons
+import be.bluexin.layoutloader.Settings
 import compose.icons.evaicons.outline.Menu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
