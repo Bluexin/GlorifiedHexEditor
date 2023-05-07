@@ -83,10 +83,7 @@ fun FrameWindowScope.App() {
             }
         }?.collectLatest {
             logger.info { "Read layouts ${it.keys}" }
-            it.forEach { (_, v) ->
-//                v.load(metadata!!, structures, lookups)
-                layouts = it
-            }
+            layouts = it
         }
     }
 

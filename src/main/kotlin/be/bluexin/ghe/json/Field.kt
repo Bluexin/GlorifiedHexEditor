@@ -6,14 +6,6 @@ import com.fasterxml.jackson.annotation.*
     use = JsonTypeInfo.Id.DEDUCTION,
     include = JsonTypeInfo.As.EXISTING_PROPERTY
 )
-@JsonSubTypes(
-    JsonSubTypes.Type(Size::class, name = "size"),
-    JsonSubTypes.Type(Structure::class, name = "structure"),
-    JsonSubTypes.Type(Lookup::class, name = "lookup"),
-    JsonSubTypes.Type(RepeatedSizeField::class, name = "repeatedSize"),
-    JsonSubTypes.Type(RepeatedStructureField::class, name = "repeatedStructure"),
-    JsonSubTypes.Type(RepeatedLookupField::class, name = "repeatedLookup"),
-)
 sealed interface Field {
     val description: String?
     val offset: Int
@@ -35,7 +27,7 @@ open class Size(
     }
 }
 
-/*abstract*/open class Structure(
+open class Structure(
     name: String,
     description: String?,
     offset: Int,
@@ -55,7 +47,7 @@ open class Size(
         get() = ::structureRef.isInitialized
 }
 
-/*abstract*/open class Lookup(
+open class Lookup(
     name: String,
     description: String?,
     offset: Int,
@@ -89,27 +81,6 @@ interface Repeated : Field {
 
     fun offset(index: Int): Int
 }
-
-/*class SizeField(
-    override var name: String,
-    override var description: String? = null,
-    override var offset: Int,
-    override var size: Int,
-) : Field, Size*/
-
-/*class StructureField(
-    override var name: String,
-    override var description: String?,
-    override var offset: Int,
-    structure: String
-) : Field, Structure(structure)*/
-
-/*class LookupField(
-    override var name: String,
-    override var description: String?,
-    override var offset: Int,
-    lookup: String
-) : Field, Lookup(lookup)*/
 
 class RepeatedSizeField(
     override var description: String?,
