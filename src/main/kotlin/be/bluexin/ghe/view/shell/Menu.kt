@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
 import be.bluexin.ghe.view.common.AppIcons
-import be.bluexin.layoutloader.Settings
+import be.bluexin.layoutloader.json.Settings
 import compose.icons.evaicons.outline.Menu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

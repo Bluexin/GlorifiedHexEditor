@@ -8,13 +8,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
-import be.bluexin.ghe.io.DataFile
-import be.bluexin.ghe.io.DataFileHandler
-import be.bluexin.ghe.io.LayoutLoader
 import be.bluexin.ghe.view.hexedit.HexEditor
 import be.bluexin.ghe.view.logger
 import be.bluexin.ghe.view.xmledit.XmlEditor
-import be.bluexin.layoutloader.*
+import be.bluexin.layoutloader.DataFile
+import be.bluexin.layoutloader.DataFileHandler
+import be.bluexin.layoutloader.LayoutLoader
+import be.bluexin.layoutloader.json.*
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

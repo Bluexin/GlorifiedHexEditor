@@ -3,8 +3,8 @@ package be.bluexin.ghe.view.xmledit
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import be.bluexin.ghe.io.DataFile
-import be.bluexin.layoutloader.DataLayout
+import be.bluexin.layoutloader.DataFile
+import be.bluexin.layoutloader.json.DataLayout
 
 @Composable
 fun XmlEditor(layouts: Map<String, DataLayout>, data: DataFile?) {

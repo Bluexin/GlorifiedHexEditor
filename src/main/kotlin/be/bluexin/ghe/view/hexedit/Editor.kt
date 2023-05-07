@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import be.bluexin.ghe.view.common.AppShapes
 import be.bluexin.ghe.view.hexedit.fieldtree.FieldTree
 import be.bluexin.ghe.view.hexedit.fieldtree.FieldTreeView
-import be.bluexin.layoutloader.DataLayout
+import be.bluexin.layoutloader.json.DataLayout
 
 @Composable
 fun HexEditor(layouts: Map<String, DataLayout>) {

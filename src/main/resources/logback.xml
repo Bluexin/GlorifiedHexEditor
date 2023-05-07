@@ -14,5 +14,5 @@
     <logger name="be.bluexin.ghe.io.LayoutLoader" level="info"/>
     <logger name="be.bluexin.ghe.io.DataFileHandler" level="info"/>
     <logger name="be.bluexin.ghe.io.WatchServiceHelper" level="info"/>
-    <logger name="be.bluexin.layoutloader.DataLayout" level="info"/>
+    <logger name="be.bluexin.layoutloader.json.DataLayout" level="info"/>
 </configuration>

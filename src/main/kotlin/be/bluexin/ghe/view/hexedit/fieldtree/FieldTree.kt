@@ -3,9 +3,9 @@ package be.bluexin.ghe.view.hexedit.fieldtree
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import be.bluexin.layoutloader.DataLayout
-import be.bluexin.layoutloader.Field
-import be.bluexin.layoutloader.Repeated
+import be.bluexin.layoutloader.json.DataLayout
+import be.bluexin.layoutloader.json.Field
+import be.bluexin.layoutloader.json.Repeated
 
 class ExpandableField(
     val field: Field,
