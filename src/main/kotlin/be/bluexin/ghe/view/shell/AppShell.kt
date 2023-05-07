@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.FrameWindowScope
+import be.bluexin.ghe.io.DataFile
+import be.bluexin.ghe.io.DataFileHandler
 import be.bluexin.ghe.io.LayoutLoader
 import be.bluexin.ghe.json.*
 import be.bluexin.ghe.view.hexedit.HexEditor
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
 import java.io.File
 
 val objectMapper = jacksonObjectMapper().apply {
@@ -48,8 +51,10 @@ fun FrameWindowScope.App() {
         mutableStateOf(emptyMap<String, LayoutStructure>())
     }
     LaunchedEffect(settings?.metadata, metadata?.structures) {
+        logger.info { "Reading structures" }
         settings?.let { LayoutLoader.load<LayoutStructure>(File(it.metadata).parentFile, metadata?.structures) }
             ?.collectLatest {
+                logger.info { "Read structures ${it.keys}" }
                 structures = it
             }
     }
@@ -57,8 +62,10 @@ fun FrameWindowScope.App() {
         mutableStateOf(emptyMap<String, LayoutLookup>())
     }
     LaunchedEffect(settings?.metadata, metadata?.lookups) {
+        logger.info { "Reading lookups" }
         settings?.let { LayoutLoader.load<LayoutLookup>(File(it.metadata).parentFile, metadata?.lookups) }
             ?.collectLatest {
+                logger.info { "Read lookups ${it.keys}" }
                 lookups = it
             }
     }
@@ -66,17 +73,35 @@ fun FrameWindowScope.App() {
     var layouts by remember {
         mutableStateOf(emptyMap<String, DataLayout>())
     }
-    LaunchedEffect(settings?.metadata, metadata?.layouts) {
-        settings?.let {
+    LaunchedEffect(structures, lookups) {
+        logger.info { "Reading layouts" }
+        if (structures.isEmpty() or lookups.isEmpty()) {
+            logger.info { "Skipped due to missing structures / lookups" }
+        } else settings?.let {
             LayoutLoader.load<DataLayout>(File(it.metadata).parentFile, metadata?.layouts) { layout ->
                 layout.load(metadata!!, structures, lookups)
             }
         }?.collectLatest {
-            layouts = it
+            logger.info { "Read layouts ${it.keys}" }
+            it.forEach { (_, v) ->
+//                v.load(metadata!!, structures, lookups)
+                layouts = it
+            }
         }
     }
-    remember(metadata, structures, lookups) {
-        metadata?.let { layouts.forEach { (_, v) -> v.load(it, structures, lookups) } }
+
+    var data by remember(layouts) { mutableStateOf<DataFile?>(null) }
+    LaunchedEffect(layouts) {
+        if (layouts.isEmpty()) {
+            logger.info { "Skipping loading data, as layouts are not loaded yet" }
+        } else {
+            val (loaded, updates) = DataFileHandler.loadData("/home/bluexin/Rebellion/XML.DAT_CLIENT_FILES/datafile.bin.files/datafile_111.xml")
+                ?: Pair(DataFile("", emptyList()), emptyFlow())
+            data = loaded
+            updates.collect {
+                // TODO : ask user whether to reload file
+            }
+        }
     }
 
     fun onLoad(file: File) {
@@ -106,7 +131,11 @@ fun FrameWindowScope.App() {
             }
         ) {
             if (layouts.isEmpty()) Column(Modifier.padding(8.dp)) { Text("Please load mappings") }
-            else selectedTab.value.compose(layouts)
+            else when (selectedTab.value) {
+                // Sucks that I can't do this as enum prop, Compose limitation
+                AppTabs.HEX -> HexEditor(layouts)
+                AppTabs.XML -> XmlEditor(layouts, data)
+            }
         }
     }
 }
@@ -114,18 +143,4 @@ fun FrameWindowScope.App() {
 enum class AppTabs(val displayName: String) {
     HEX("Hex"),
     XML("Xml");
-
-    // Sucks that I can't do this as enum prop, Compose limitation
-    @Composable
-    fun compose(layouts: Map<String, DataLayout>) {
-        when (this) {
-            HEX -> {
-                HexEditor(layouts)
-            }
-
-            XML -> {
-                XmlEditor(layouts)
-            }
-        }
-    }
 }

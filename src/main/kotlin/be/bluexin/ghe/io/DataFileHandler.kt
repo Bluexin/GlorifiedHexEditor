@@ -11,7 +11,7 @@ import java.nio.file.StandardWatchEventKinds
 
 data class DataFile(
     val path: String,
-    val data: Collection<DataHolder>
+    val data: List<DataHolder>
 )
 
 data class DataHolder(
@@ -19,7 +19,7 @@ data class DataHolder(
     val text: String
 )
 
-class DataFileHandler {
+object DataFileHandler {
     private val logger = KotlinLogging.logger { }
 
     /**
@@ -41,7 +41,7 @@ class DataFileHandler {
                                 val text = line.substringAfter('>').dropLast(7)
                                 val position = it.filePointer - text.length - 8
                                 add(DataHolder(position, text).also {
-                                    logger.info { "Found element $it" }
+                                    logger.debug { "Found element $it" }
                                 })
                             }
 
@@ -83,8 +83,7 @@ class DataFileHandler {
 fun main() {
     runBlocking {
         val path = "/home/bluexin/Rebellion/XML.DAT_CLIENT_FILES/datafile.bin.files/datafile_111.xml"
-        val xml = DataFileHandler()
-        val (data, updates) = xml.loadData(path) ?: error("Something went wrong reading datafile 111")
+        val (data, updates) = DataFileHandler.loadData(path) ?: error("Something went wrong reading datafile 111")
         val watcher = launch {
             updates.collectLatest {
                 logger.info { "Caught update" }
@@ -92,7 +91,7 @@ fun main() {
         }
         delay(20_000)
         logger.info { "Replacing all 0's with F's" }
-        xml.writeData(data)
+        DataFileHandler.writeData(data)
         watcher.cancelAndJoin()
     }
 }

@@ -1,91 +1,115 @@
 package be.bluexin.ghe.json
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.*
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.DEDUCTION,
     include = JsonTypeInfo.As.EXISTING_PROPERTY
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(SizeField::class),
-    JsonSubTypes.Type(StructureField::class),
-    JsonSubTypes.Type(RepeatedSizeField::class),
-    JsonSubTypes.Type(RepeatedStructureField::class),
+    JsonSubTypes.Type(Size::class, name = "size"),
+    JsonSubTypes.Type(Structure::class, name = "structure"),
+    JsonSubTypes.Type(Lookup::class, name = "lookup"),
+    JsonSubTypes.Type(RepeatedSizeField::class, name = "repeatedSize"),
+    JsonSubTypes.Type(RepeatedStructureField::class, name = "repeatedStructure"),
+    JsonSubTypes.Type(RepeatedLookupField::class, name = "repeatedLookup"),
 )
 sealed interface Field {
-    var description: String?
-    var offset: Int
+    val description: String?
+    val offset: Int
     val name: String
+
+    @get:JsonIgnore
+    val enabled: Boolean get() = true
 }
 
-interface Size {
-    val size: Int
+open class Size(
+    override val name: String,
+    override val description: String? = null,
+    override val offset: Int,
+    open val size: Int,
+) : Field {
+
+    override fun toString(): String {
+        return "Size(name='$name', description=$description, offset=$offset, size=$size)"
+    }
 }
 
-abstract class Structure(
+/*abstract*/open class Structure(
+    name: String,
+    description: String?,
+    offset: Int,
     structure: String
-) : Size {
+) : Size(name, description, offset, 0), Field {
     val structure: String = structure
-        get() = if (::structureRef.isInitialized) structureRef.name else field
+        get() = if (enabled) structureRef.name else field
 
     @JsonIgnore
     lateinit var structureRef: LayoutStructure
 
     @get:JsonIgnore
     override val size: Int
-        get() = structureRef.size
+        get() = if (enabled) structureRef.size else 0
+
+    override val enabled: Boolean
+        get() = ::structureRef.isInitialized
 }
 
-abstract class Lookup(
+/*abstract*/open class Lookup(
+    name: String,
+    description: String?,
+    offset: Int,
     lookup: String
-) : Size {
+) : Size(name, description, offset, 0), Field {
     val lookup: String = lookup
-        get() = if (::lookupRef.isInitialized) lookupRef.name else field
+        get() = if (enabled) lookupRef.name else field
 
     @JsonIgnore
     lateinit var lookupRef: LayoutLookup
 
     @get:JsonIgnore
     override val size: Int
-        get() = lookupRef.size
+        get() = if (enabled) lookupRef.size else 0
+
+    override val enabled: Boolean
+        get() = ::lookupRef.isInitialized
 }
 
 interface Repeated : Field {
     @get:JsonIgnore
     override val name: String
         get() = name("group")
-    var repeat: Int
-    var element_name: String
+    val repeat: Int
 
-    fun name(qualifier: String): String = element_name.replace("\$i", qualifier)
+    @get:JsonProperty("element_name")
+    val elementName: String
+
+    fun name(qualifier: String): String = elementName.replace("\$i", qualifier)
     fun name(index: Int): String = name(index.toString())
 
     fun offset(index: Int): Int
 }
 
-class SizeField(
+/*class SizeField(
     override var name: String,
     override var description: String? = null,
     override var offset: Int,
     override var size: Int,
-) : Field, Size
+) : Field, Size*/
 
-class StructureField(
+/*class StructureField(
     override var name: String,
     override var description: String?,
     override var offset: Int,
     structure: String
-) : Field, Structure(structure)
+) : Field, Structure(structure)*/
 
-class LookupField(
+/*class LookupField(
     override var name: String,
     override var description: String?,
     override var offset: Int,
     lookup: String
-) : Field, Lookup(lookup)
+) : Field, Lookup(lookup)*/
 
 class RepeatedSizeField(
     override var description: String?,
@@ -93,30 +117,36 @@ class RepeatedSizeField(
     @get:JsonInclude
     override var size: Int,
     override var repeat: Int,
-    override var element_name: String
-) : Field, Size, Repeated {
+    override var elementName: String
+) : Field, Size("", description, offset, 0), Repeated {
+    override val name: String
+        get() = super<Repeated>.name
 
     override fun offset(index: Int): Int = offset + size * index
 }
 
 class RepeatedStructureField(
-    override var description: String?,
-    override var offset: Int,
+    description: String?,
+    offset: Int,
     structure: String,
     override var repeat: Int,
-    override var element_name: String
-) : Field, Structure(structure), Repeated {
+    override var elementName: String
+) : Field, Structure("", description, offset, structure), Repeated {
+    override val name: String
+        get() = super<Repeated>.name
 
     override fun offset(index: Int): Int = offset + size * index
 }
 
 class RepeatedLookupField(
-    override var description: String?,
-    override var offset: Int,
+    description: String?,
+    offset: Int,
     lookup: String,
     override var repeat: Int,
-    override var element_name: String
-) : Field, Lookup(lookup), Repeated {
+    override var elementName: String
+) : Lookup("", description, offset, lookup), Repeated {
+    override val name: String
+        get() = super<Repeated>.name
 
     override fun offset(index: Int): Int = offset + size * index
 }

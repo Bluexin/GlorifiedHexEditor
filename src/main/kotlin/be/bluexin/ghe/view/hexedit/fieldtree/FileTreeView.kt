@@ -288,7 +288,6 @@ private fun LookupModal(lookupRef: LayoutLookup, currentValue: MutableState<Text
     }
 }
 
-
 @Composable
 fun tooltip(text: String) {
     Row(
